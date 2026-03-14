@@ -1,0 +1,25 @@
+{
+  "name": "resume-etl-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Resume to Excel ETL SaaS Pipeline",
+  "workspaces": [
+    "packages/*",
+    "services/*"
+  ],
+  "scripts": {
+    "setup": "bash scripts/setup.sh",
+    "migrate": "bash scripts/migrate.sh",
+    "dev:api": "npm run dev --workspace=services/api-gateway",
+    "dev:worker": "cd services/parser-worker && python src/main.py",
+    "dev:export": "cd services/export-service && python src/main.py",
+    "test:api": "npm test --workspace=services/api-gateway",
+    "test:worker": "cd services/parser-worker && python -m pytest tests/ -v",
+    "test:export": "cd services/export-service && python -m pytest tests/ -v",
+    "lint": "npm run lint --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "license": "MIT"
+}

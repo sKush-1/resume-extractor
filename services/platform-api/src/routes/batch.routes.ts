@@ -5,6 +5,7 @@ import {
     exportBatch,
     getBatches,
     getCandidates,
+    getDashboardStats,
 } from "../controllers/batch.controller";
 import { authMiddleware } from "../middlewares/middleware.auth";
 
@@ -15,6 +16,7 @@ export const batchRoutes = async (fastify: FastifyInstance) => {
     fastify.addHook("preHandler", authMiddleware);
 
     fastify.get("/", getBatches);
+    fastify.get("/stats", getDashboardStats);
 
     fastify.post("/upload", {
         config: {

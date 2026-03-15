@@ -1,6 +1,6 @@
 'use client';
 
-import { Bell, Menu } from 'lucide-react';
+import { Bell, Menu, Loader2 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
@@ -10,9 +10,33 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { currentUser } from '@/lib/mock-data';
+import { useRouter } from 'next/navigation';
+import { fetchApi } from '@/lib/api';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import { useAuth } from '@/contexts/auth-context';
 
 export function Header() {
+  const router = useRouter();
+  const { user } = useAuth();
+  const [isSigningOut, setIsSigningOut] = useState(false);
+
+  const handleSignOut = async () => {
+    setIsSigningOut(true);
+    try {
+      await fetchApi('/user/logout', { method: 'POST' });
+      router.push('/auth/login');
+      toast.success('Logged out successfully');
+    } catch (error: any) {
+      console.error('Logout error:', error);
+      router.push('/auth/login');
+    } finally {
+      setIsSigningOut(false);
+    }
+  };
+
+  if (!user) return null;
+
   return (
     <header className="lg:ml-64 border-b border-border bg-background sticky top-0 z-40">
       <div className="flex items-center justify-between px-6 py-4">
@@ -34,9 +58,9 @@ export function Header() {
             <DropdownMenuTrigger asChild>
               <button className="flex items-center gap-3 hover:bg-muted px-3 py-2 rounded-lg transition-colors">
                 <Avatar className="w-8 h-8">
-                  <AvatarImage src={currentUser.avatar} alt={currentUser.name} />
+                  <AvatarImage src={user.avatar} alt={user.name} />
                   <AvatarFallback>
-                    {currentUser.name
+                    {user.name
                       .split(' ')
                       .map((n) => n[0])
                       .join('')}
@@ -44,10 +68,10 @@ export function Header() {
                 </Avatar>
                 <div className="hidden sm:flex flex-col text-left">
                   <span className="text-sm font-medium text-foreground">
-                    {currentUser.name}
+                    {user.name}
                   </span>
                   <span className="text-xs text-muted-foreground">
-                    {currentUser.email}
+                    {user.email}
                   </span>
                 </div>
               </button>
@@ -58,8 +82,18 @@ export function Header() {
               <DropdownMenuItem>Profile Settings</DropdownMenuItem>
               <DropdownMenuItem>Preferences</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-destructive">
-                Sign Out
+              <DropdownMenuItem
+                className="text-destructive focus:text-destructive"
+                onSelect={(e) => {
+                  e.preventDefault();
+                  handleSignOut();
+                }}
+                disabled={isSigningOut}
+              >
+                {isSigningOut ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : null}
+                {isSigningOut ? 'Signing Out...' : 'Sign Out'}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

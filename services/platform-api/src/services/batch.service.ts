@@ -242,4 +242,26 @@ export class BatchService {
         );
         return result.rows;
     }
+
+    async getDashboardStats(userId: string): Promise<any> {
+        const statsResult = await pool.query(
+            `SELECT 
+                COALESCE(SUM(resume_count), 0) as "totalResumes",
+                COUNT(*) FILTER (WHERE status = 'processing') as "activeBatches",
+                COUNT(*) FILTER (WHERE status IN ('completed', 'exported')) as "completedBatches",
+                AVG(EXTRACT(EPOCH FROM (completed_at - created_at)) / 60) FILTER (WHERE completed_at IS NOT NULL) as "avgProcessingTime"
+             FROM batches 
+             WHERE user_id = $1`,
+            [userId]
+        );
+
+        const stats = statsResult.rows[0];
+
+        return {
+            totalResumes: parseInt(stats.totalResumes, 10),
+            activeBatches: parseInt(stats.activeBatches, 10),
+            completedBatches: parseInt(stats.completedBatches, 10),
+            avgProcessingTime: stats.avgProcessingTime ? parseFloat(parseFloat(stats.avgProcessingTime).toFixed(1)) : 0,
+        };
+    }
 }

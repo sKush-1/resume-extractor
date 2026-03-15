@@ -195,7 +195,7 @@ export const getUserDetails = async (
 
     const getUserByid = await getUserByID(decoded.user_id);
 
-    if (!getUserByID) {
+    if (!getUserByid) {
       return reply.status(404).send({ message: "User no longer exists." });
     }
 

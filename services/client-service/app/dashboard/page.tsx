@@ -1,8 +1,9 @@
+'use client';
+
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { StatCard } from '@/components/dashboard/stat-card';
 import { RecentBatchesTable } from '@/components/dashboard/recent-batches-table';
-import { dashboardStats } from '@/lib/mock-data';
 import {
   BarChart3,
   Zap,
@@ -10,22 +11,45 @@ import {
   Clock,
   Upload,
   ArrowRight,
+  Loader2,
 } from 'lucide-react';
-import type { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'Dashboard - ResumeParse',
-  description: 'View your resume parsing dashboard and statistics',
-};
+import { useEffect, useState } from 'react';
+import { fetchApi } from '@/lib/api';
+import { useAuth } from '@/contexts/auth-context';
 
 export default function DashboardPage() {
+  const { user } = useAuth();
+  const [stats, setStats] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadStats() {
+      try {
+        const data = await fetchApi('/batches/stats');
+        setStats(data.data);
+      } catch (error) {
+        console.error('Failed to fetch stats:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadStats();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex h-[calc(100vh-4rem)] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
   return (
     <div className="p-6 lg:p-8">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-foreground mb-2">Dashboard</h1>
         <p className="text-muted-foreground">
-          Welcome back! Here's your resume parsing overview.
+          Welcome back, {user?.name}! Here's your resume parsing overview.
         </p>
       </div>
 
@@ -52,27 +76,25 @@ export default function DashboardPage() {
         <StatCard
           icon={BarChart3}
           label="Total Resumes"
-          value={dashboardStats.totalResumes.toLocaleString()}
+          value={stats?.totalResumes?.toLocaleString() || '0'}
           description="All time"
-          trend={{ value: 12, direction: 'up' }}
         />
         <StatCard
           icon={Zap}
           label="Active Batches"
-          value={dashboardStats.activeBatches}
+          value={stats?.activeBatches || '0'}
           description="Currently processing"
         />
         <StatCard
           icon={CheckCircle2}
           label="Completed Batches"
-          value={dashboardStats.completedBatches}
+          value={stats?.completedBatches || '0'}
           description="Successfully processed"
-          trend={{ value: 8, direction: 'up' }}
         />
         <StatCard
           icon={Clock}
           label="Avg Processing Time"
-          value={`${dashboardStats.avgProcessingTime}m`}
+          value={`${stats?.avgProcessingTime || '0'}m`}
           description="Per resume"
         />
       </div>

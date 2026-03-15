@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { currentUser, apiKeys } from '@/lib/mock-data';
+import { apiKeys } from '@/lib/mock-data';
 import {
   Copy,
   Eye,
@@ -24,16 +24,29 @@ import {
   Users,
 } from 'lucide-react';
 import type { Metadata } from 'next';
+import { useAuth } from '@/contexts/auth-context';
+import { useEffect } from 'react';
 
 export default function SettingsPage() {
+  const { user } = useAuth();
   const [visibleKeys, setVisibleKeys] = useState<Record<string, boolean>>({});
   const [apiKeysState, setApiKeysState] = useState(apiKeys);
   const [formData, setFormData] = useState({
-    name: currentUser.name,
-    email: currentUser.email,
+    name: '',
+    email: '',
     storageProvider: 'aws-s3',
     aiModel: 'gpt-4',
   });
+
+  useEffect(() => {
+    if (user) {
+      setFormData((prev) => ({
+        ...prev,
+        name: user.name,
+        email: user.email,
+      }));
+    }
+  }, [user]);
 
   const toggleKeyVisibility = (id: string) => {
     setVisibleKeys((prev) => ({

@@ -284,3 +284,14 @@ export const updateProfile = async (
 //   }
 // };
 
+
+export const logoutUser = async (
+  _request: FastifyRequest,
+  reply: FastifyReply
+) => {
+  return reply
+    .clearCookie("accessToken", { path: "/" })
+    .clearCookie("refreshToken", { path: "/" })
+    .status(200)
+    .send({ message: "Logged out successfully" });
+};

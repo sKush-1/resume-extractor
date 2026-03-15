@@ -122,3 +122,21 @@ export const getCandidates = async (
         return reply.code(400).send({ error: error.message });
     }
 };
+
+export const getDashboardStats = async (
+    request: FastifyRequest,
+    reply: FastifyReply
+) => {
+    try {
+        const userId = request.user_id;
+        if (!userId) {
+            return reply.code(401).send({ error: "Unauthorized" });
+        }
+
+        const stats = await batchService.getDashboardStats(userId);
+        return reply.send({ success: true, data: stats });
+    } catch (error: any) {
+        logger.error("Error in getDashboardStats controller", error);
+        return reply.code(400).send({ error: error.message });
+    }
+};

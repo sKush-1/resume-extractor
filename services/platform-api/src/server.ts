@@ -76,6 +76,13 @@ const start = async () => {
       max: 100, // Default global limit
       timeWindow: "1 minute",
       redis: server.redis, // Use the decorated redis instance
+      errorResponseBuilder: (request, context) => {
+        return {
+          statusCode: 429,
+          error: "Too Many Requests",
+          message: `Rate limit exceeded. Try again in ${context.after}.`
+        }
+      }
     });
 
     await server.register(fastifyCookie, {

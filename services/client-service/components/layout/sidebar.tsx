@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard,
   Upload,
@@ -10,8 +10,12 @@ import {
   Download,
   Settings,
   LogOut,
+  Loader2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { fetchApi } from '@/lib/api';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 const navItems = [
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -24,6 +28,23 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const [isSigningOut, setIsSigningOut] = useState(false);
+
+  const handleSignOut = async () => {
+    setIsSigningOut(true);
+    try {
+      await fetchApi('/user/logout', { method: 'POST' });
+      router.push('/auth/login');
+      toast.success('Logged out successfully');
+    } catch (error: any) {
+      console.error('Logout error:', error);
+      // Even if API fails, we should clear local session and redirect
+      router.push('/auth/login');
+    } finally {
+      setIsSigningOut(false);
+    }
+  };
 
   return (
     <aside className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-64 lg:flex-col bg-sidebar border-r border-sidebar-border">
@@ -66,9 +87,17 @@ export function Sidebar() {
 
       {/* Footer */}
       <div className="p-3 border-t border-sidebar-border">
-        <button className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent text-sm font-medium transition-colors">
-          <LogOut className="w-5 h-5" />
-          <span>Sign Out</span>
+        <button
+          onClick={handleSignOut}
+          disabled={isSigningOut}
+          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent text-sm font-medium transition-colors disabled:opacity-50"
+        >
+          {isSigningOut ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            <LogOut className="w-5 h-5" />
+          )}
+          <span>{isSigningOut ? 'Signing Out...' : 'Sign Out'}</span>
         </button>
       </div>
     </aside>

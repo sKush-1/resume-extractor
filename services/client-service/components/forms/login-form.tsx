@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { fetchApi } from '@/lib/api';
 import { useEffect } from 'react';
+import { toast } from 'sonner';
 import { useAuth } from '@/contexts/auth-context';
 
 export function LoginForm() {
@@ -22,11 +23,6 @@ export function LoginForm() {
     password: '',
   });
 
-  useEffect(() => {
-    if (searchParams.get('expired')) {
-      setErrors('Your session has expired. Please log in again.');
-    }
-  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,6 +47,78 @@ export function LoginForm() {
     }
   };
 
+  const handleGoogleLogin = () => {
+    const google = (window as any).google;
+    if (!google) {
+      toast.error('Google login is loading, please try again in a moment.');
+      return;
+    }
+
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    if (!clientId) {
+      toast.error('Google Client ID not configured.');
+      return;
+    }
+
+    google.accounts.id.initialize({
+      client_id: clientId,
+      callback: async (response: any) => {
+        setIsLoading(true);
+        try {
+          await fetchApi('/user/google-login', {
+            method: 'POST',
+            body: JSON.stringify({ token: response.credential }),
+          });
+          await refreshUser();
+          router.push('/dashboard');
+          toast.success('Logged in with Google!');
+        } catch (err: any) {
+          toast.error(err.message || 'Google login failed');
+        } finally {
+          setIsLoading(false);
+        }
+      },
+    });
+
+    google.accounts.id.prompt(); // Show one tap
+    google.accounts.id.renderButton(
+      document.getElementById('google-login-btn'),
+      { theme: 'outline', size: 'large', width: '100%' }
+    );
+  };
+
+  useEffect(() => {
+    const google = (window as any).google;
+    if (google && document.getElementById('google-login-btn')) {
+      const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+      if (clientId) {
+        google.accounts.id.initialize({
+          client_id: clientId,
+          callback: async (response: any) => {
+            setIsLoading(true);
+            try {
+              await fetchApi('/user/google-login', {
+                method: 'POST',
+                body: JSON.stringify({ token: response.credential }),
+              });
+              await refreshUser();
+              router.push('/dashboard');
+              toast.success('Logged in with Google!');
+            } catch (err: any) {
+              toast.error(err.message || 'Google login failed');
+            } finally {
+              setIsLoading(false);
+            }
+          },
+        });
+        google.accounts.id.renderButton(
+          document.getElementById('google-login-btn'),
+          { theme: 'outline', size: 'large', width: '300' }
+        );
+      }
+    }
+  }, []);
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
@@ -68,6 +136,19 @@ export function LoginForm() {
           </div>
         )
       }
+
+      <div id="google-login-btn" className="w-full flex justify-center"></div>
+
+      <div className="relative">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t border-border" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-background px-2 text-muted-foreground">
+            Or continue with
+          </span>
+        </div>
+      </div>
 
       <div className="space-y-4">
         <div>

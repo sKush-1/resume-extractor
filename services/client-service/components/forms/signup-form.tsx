@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Eye, EyeOff, AlertCircle, ArrowLeft, Mail } from 'lucide-react';
 import { fetchApi } from '@/lib/api';
+import { toast } from 'sonner';
 import {
   InputOTP,
   InputOTPGroup,
@@ -31,6 +32,38 @@ export function SignupForm() {
     password: '',
     confirmPassword: '',
   });
+
+  useEffect(() => {
+    const google = (window as any).google;
+    if (google && document.getElementById('google-signup-btn')) {
+      const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+      if (clientId) {
+        google.accounts.id.initialize({
+          client_id: clientId,
+          callback: async (response: any) => {
+            setIsLoading(true);
+            try {
+              await fetchApi('/user/google-login', {
+                method: 'POST',
+                body: JSON.stringify({ token: response.credential }),
+              });
+              await refreshUser();
+              router.push('/dashboard');
+              toast.success('Signed up with Google!');
+            } catch (err: any) {
+              toast.error(err.message || 'Google login failed');
+            } finally {
+              setIsLoading(false);
+            }
+          },
+        });
+        google.accounts.id.renderButton(
+          document.getElementById('google-signup-btn'),
+          { theme: 'outline', size: 'large', width: '300' }
+        );
+      }
+    }
+  }, [step]); // Re-render button if we go back from verify step
 
   const handlePasswordChange = (value: string) => {
     setFormData({ ...formData, password: value });
@@ -193,6 +226,19 @@ export function SignupForm() {
         </div>
       )}
 
+      <div id="google-signup-btn" className="w-full flex justify-center"></div>
+
+      <div className="relative">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t border-border" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-background px-2 text-muted-foreground">
+            Or continue with
+          </span>
+        </div>
+      </div>
+
       <div className="space-y-4">
         <div>
           <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
@@ -290,4 +336,3 @@ export function SignupForm() {
     </form>
   );
 }
-

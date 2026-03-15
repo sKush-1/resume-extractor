@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -20,6 +20,18 @@ import {
 const STATUS_FILTERS = ['all', 'pending', 'processing', 'completed', 'failed'] as const;
 
 export default function JobsPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center p-24">
+        <Loader className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    }>
+      <JobsPageContent />
+    </Suspense>
+  );
+}
+
+function JobsPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const batchIdFromUrl = searchParams.get('id');

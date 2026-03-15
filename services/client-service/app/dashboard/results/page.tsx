@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -36,6 +36,18 @@ const COLUMNS = [
 ];
 
 export default function ResultsPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center p-24">
+        <Loader className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    }>
+      <ResultsPageContent />
+    </Suspense>
+  );
+}
+
+function ResultsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const batchId = searchParams.get('batch');

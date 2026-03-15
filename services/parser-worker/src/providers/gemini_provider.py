@@ -6,6 +6,7 @@ import requests
 from .base import AIProvider
 from .ollama_provider import EXTRACTION_SYSTEM_PROMPT
 from ..logger import create_logger
+from ..config import AI_TIMEOUT
 
 logger = create_logger("gemini-provider")
 
@@ -36,7 +37,7 @@ class GeminiProvider(AIProvider):
                     "responseMimeType": "application/json",
                 },
             },
-            timeout=60,
+            timeout=AI_TIMEOUT,
         )
 
         response.raise_for_status()

@@ -56,4 +56,5 @@ GEMINI_MODEL = _get("GEMINI_MODEL", "gemini-1.5-flash")
 
 WORKER_CONCURRENCY = int(_get("WORKER_CONCURRENCY", "4"))
 MAX_RETRIES = int(_get("MAX_RETRIES", "3"))
+AI_TIMEOUT = int(_get("JOB_TIMEOUT", "180000")) // 1000  # Convert ms to seconds
 LOG_LEVEL = _get("LOG_LEVEL", "INFO")

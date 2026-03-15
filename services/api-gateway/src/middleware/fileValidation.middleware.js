@@ -43,7 +43,7 @@ function fileValidationMiddleware(config) {
                     success: false,
                     error: {
                         code: ErrorCodes.INVALID_FILE_TYPE,
-                        message: `Invalid file type: ${file.originalname}. Only PDF and DOCX are allowed.`,
+                        message: `Invalid file type: ${file.originalname}. Only PDF, DOCX and TXT are allowed.`,
                     },
                 });
             }

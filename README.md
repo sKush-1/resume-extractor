@@ -1,6 +1,6 @@
 # Resume to Excel ETL Platform
 
-A production-grade pipeline that batch-processes up to **1000 resumes** (PDF/DOCX), extracts structured candidate data using AI, and exports results to Excel.
+A production-grade pipeline that batch-processes up to **1000 resumes** (PDF/DOCX/TXT), extracts structured candidate data using AI, and exports results to Excel.
 
 Built with **Node.js** (API) + **Python** (AI parsing & export).
 
@@ -9,7 +9,7 @@ Built with **Node.js** (API) + **Python** (AI parsing & export).
 ## Architecture
 
 ```
-Upload PDFs/DOCX
+Upload PDFs/DOCX/TXT
        │
        ▼
 ┌──────────────┐    ┌───────────┐    ┌────────────┐
@@ -46,7 +46,7 @@ Upload PDFs/DOCX
 | Database | PostgreSQL |
 | Storage | S3 / MinIO / Cloudflare R2 |
 | AI Parsing | Ollama / OpenAI / Gemini |
-| Text Extraction | PyMuPDF, python-docx |
+| Text Extraction | PyMuPDF, python-docx, Plain Text |
 | Excel Export | pandas, openpyxl |
 | Containerization | Docker, Docker Compose, Kubernetes |
 
@@ -226,7 +226,8 @@ curl -X POST http://localhost:3000/batches/upload \
   -H "x-api-key: your-secret-api-key" \
   -F "resumes=@resume1.pdf" \
   -F "resumes=@resume2.pdf" \
-  -F "resumes=@resume3.docx"
+  -F "resumes=@resume3.docx" \
+  -F "resumes=@resume4.txt"
 ```
 
 Response:
@@ -318,7 +319,7 @@ resume-extractor/
 │   │   └── tests/
 │   ├── parser-worker/           # Python resume parser
 │   │   └── src/
-│   │       ├── extractors/      # PDF / DOCX text extraction
+│   │       ├── extractors/      # PDF / DOCX / TXT text extraction
 │   │       ├── providers/       # AI provider adapters
 │   │       ├── parsers/         # Schema + validation
 │   │       ├── storage/         # S3 download client

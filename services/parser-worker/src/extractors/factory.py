@@ -4,6 +4,7 @@ Extractor factory - selects the right extractor based on file type.
 
 from .pdf_extractor import extract_text_from_pdf
 from .docx_extractor import extract_text_from_docx
+from .txt_extractor import extract_text_from_txt
 
 
 def extract_text(file_bytes: bytes, file_type: str) -> str:
@@ -12,7 +13,7 @@ def extract_text(file_bytes: bytes, file_type: str) -> str:
 
     Args:
         file_bytes: Raw file content
-        file_type: File extension without dot ('pdf' or 'docx')
+        file_type: File extension without dot ('pdf', 'docx', or 'txt')
 
     Returns:
         Extracted text
@@ -23,6 +24,7 @@ def extract_text(file_bytes: bytes, file_type: str) -> str:
     extractors = {
         "pdf": extract_text_from_pdf,
         "docx": extract_text_from_docx,
+        "txt": extract_text_from_txt,
     }
 
     extractor = extractors.get(file_type.lower())

@@ -103,9 +103,10 @@ const BatchStatuses = {
 const ALLOWED_MIME_TYPES = [
     'application/pdf',
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'text/plain',
 ];
 
-const ALLOWED_EXTENSIONS = ['.pdf', '.docx'];
+const ALLOWED_EXTENSIONS = ['.pdf', '.docx', '.txt'];
 
 module.exports = {
     ErrorCodes,

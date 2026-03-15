@@ -6,6 +6,7 @@ Calls the Ollama HTTP API for local LLM inference.
 import requests
 from .base import AIProvider
 from ..logger import create_logger
+from ..config import AI_TIMEOUT
 
 logger = create_logger("ollama-provider")
 
@@ -52,7 +53,7 @@ class OllamaProvider(AIProvider):
                 "stream": False,
                 "format": "json",
             },
-            timeout=120,
+            timeout=AI_TIMEOUT,
         )
 
         response.raise_for_status()

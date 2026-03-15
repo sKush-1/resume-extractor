@@ -47,7 +47,7 @@ Content-Type: multipart/form-data
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `resumes` | File[] | PDF/DOCX resume files (max 1000 per batch, 10MB each) |
+| `resumes` | File[] | PDF/DOCX/TXT resume files (max 1000 per batch, 10MB each) |
 
 **Response (201):**
 ```json
@@ -67,7 +67,8 @@ curl -X POST http://localhost:3000/batches/upload \
   -H "x-api-key: your-api-key-here" \
   -F "resumes=@resume1.pdf" \
   -F "resumes=@resume2.pdf" \
-  -F "resumes=@resume3.docx"
+  -F "resumes=@resume3.docx" \
+  -F "resumes=@resume4.txt"
 ```
 
 ---
@@ -150,7 +151,7 @@ GET /batches/:id/export
 | Code | HTTP | Description |
 |------|------|-------------|
 | `VALIDATION_ERROR` | 400 | Invalid request data |
-| `INVALID_FILE_TYPE` | 400 | File is not PDF/DOCX |
+| `INVALID_FILE_TYPE` | 400 | File is not PDF/DOCX/TXT |
 | `FILE_TOO_LARGE` | 400 | File exceeds size limit |
 | `BATCH_LIMIT_EXCEEDED` | 400 | Too many files in batch |
 | `UNAUTHORIZED` | 401 | Missing/invalid API key |

@@ -6,6 +6,7 @@ import requests
 from .base import AIProvider
 from .ollama_provider import EXTRACTION_SYSTEM_PROMPT
 from ..logger import create_logger
+from ..config import AI_TIMEOUT
 
 logger = create_logger("openai-provider")
 
@@ -34,7 +35,7 @@ class OpenAIProvider(AIProvider):
                 "temperature": 0.1,
                 "response_format": {"type": "json_object"},
             },
-            timeout=60,
+            timeout=AI_TIMEOUT,
         )
 
         response.raise_for_status()

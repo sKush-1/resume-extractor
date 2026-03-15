@@ -191,7 +191,7 @@ export class BatchService {
                     Bucket: process.env.S3_BUCKET || "resumes",
                     Key: batch.export_file_key,
                 }) as any,
-                { expiresIn: 3600 }
+                { expiresIn: 7 * 24 * 3600 }
             );
             return { status: "exported", downloadUrl: signedUrl };
         }

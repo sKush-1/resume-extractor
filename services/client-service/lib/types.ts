@@ -30,6 +30,7 @@ export interface CandidateResult {
 export interface Job {
   id: string;
   batchId: string;
+  batchName?: string;
   fileName: string;
   status: 'pending' | 'processing' | 'completed' | 'failed';
   progress: number;

@@ -8,10 +8,12 @@ import { Input } from '@/components/ui/input';
 import { Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { fetchApi } from '@/lib/api';
 import { useEffect } from 'react';
+import { useAuth } from '@/contexts/auth-context';
 
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { refreshUser } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<string | null>(null);
@@ -32,12 +34,14 @@ export function LoginForm() {
     setErrors(null);
 
     try {
-      const data = await fetchApi('/user/login', {
+      await fetchApi('/user/login', {
         method: 'POST',
         body: JSON.stringify(formData),
       });
 
-      // Save tokens in session or cookies if needed (though API sets cookies)
+      // Refresh the global auth state now that candles are set
+      await refreshUser();
+
       // Redirect to dashboard
       router.push('/dashboard');
     } catch (err: any) {

@@ -43,13 +43,23 @@ export function JobStatusCard({ job }: JobStatusCardProps) {
             <p className="text-sm font-medium text-foreground truncate">
               {job.fileName}
             </p>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {new Date(job.createdAt).toLocaleDateString()} at{' '}
-              {new Date(job.createdAt).toLocaleTimeString([], {
-                hour: '2-digit',
-                minute: '2-digit',
-              })}
-            </p>
+            <div className="flex items-center gap-2 mt-1 flex-wrap">
+              <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded font-mono text-muted-foreground">
+                ID: {job.id.substring(0, 8)}
+              </span>
+              {job.batchName && (
+                <span className="text-[10px] bg-primary/10 px-1.5 py-0.5 rounded font-medium text-primary max-w-[120px] truncate">
+                  {job.batchName}
+                </span>
+              )}
+              <p className="text-xs text-muted-foreground">
+                {new Date(job.createdAt).toLocaleDateString()} at{' '}
+                {new Date(job.createdAt).toLocaleTimeString([], {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
+              </p>
+            </div>
           </div>
         </div>
         <Badge variant={config.variant}>

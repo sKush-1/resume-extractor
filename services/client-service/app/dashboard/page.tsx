@@ -126,17 +126,17 @@ export default function DashboardPage() {
         <div className="bg-card rounded-xl border border-border p-6">
           <div className="flex items-start justify-between mb-4">
             <div>
-              <h3 className="font-semibold text-foreground">API Integration</h3>
+              <h3 className="font-semibold text-foreground">View Jobs</h3>
               <p className="text-sm text-muted-foreground mt-1">
-                Integrate ResumeParse into your application
+                Monitor live processing of your resumes
               </p>
             </div>
             <div className="p-2 bg-primary/10 rounded-lg">
-              <ArrowRight className="w-5 h-5 text-primary" />
+              <Zap className="w-5 h-5 text-primary" />
             </div>
           </div>
           <Button variant="outline" className="w-full" asChild>
-            <Link href="/dashboard/settings">Go to Settings</Link>
+            <Link href="/dashboard/jobs">Go to Jobs</Link>
           </Button>
         </div>
       </div>

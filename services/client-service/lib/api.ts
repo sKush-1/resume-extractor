@@ -32,14 +32,14 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
                     },
                 });
             } else {
-                // Refresh failed, redirect to login
-                if (typeof window !== 'undefined') {
+                // Refresh failed, redirect to login unless already on auth page
+                if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/auth')) {
                     window.location.href = '/auth/login?expired=true';
                 }
             }
         } catch (error) {
             console.error('Refresh token error:', error);
-            if (typeof window !== 'undefined') {
+            if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/auth')) {
                 window.location.href = '/auth/login?expired=true';
             }
         }

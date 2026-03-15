@@ -12,11 +12,13 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from '@/components/ui/input-otp';
+import { useAuth } from '@/contexts/auth-context';
 
 type Step = 'signup' | 'verify';
 
 export function SignupForm() {
   const router = useRouter();
+  const { refreshUser } = useAuth();
   const [step, setStep] = useState<Step>('signup');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -89,6 +91,9 @@ export function SignupForm() {
         method: 'POST',
         body: JSON.stringify({ name, email, password }),
       });
+
+      // Refresh global auth state
+      await refreshUser();
 
       router.push('/dashboard');
     } catch (err: any) {

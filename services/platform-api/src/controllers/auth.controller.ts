@@ -163,15 +163,23 @@ export const refreshAccessToken = async (
     });
 
     return reply
+      .setCookie("accessToken", newAccessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+        maxAge: 15 * 60 * 1000,
+      })
       .setCookie("refreshToken", refreshToken, {
         httpOnly: true,
-        secure: true,
+        secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
+        path: "/",
         maxAge: 7 * 24 * 60 * 60 * 1000,
       })
-      .status(201)
+      .status(200)
       .send({
-        message: "User registered successfully",
+        message: "Token refreshed successfully",
         accessToken: newAccessToken,
       });
   } catch (error) {

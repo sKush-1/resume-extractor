@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -14,7 +14,16 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { fetchApi } from '@/lib/api';
-import { Download, Search, Zap, Loader, ExternalLink } from 'lucide-react';
+import { Download, Search, Zap, Loader, ExternalLink, ChevronDown } from 'lucide-react';
+import { toast } from 'sonner';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
 
 const COLUMNS = [
   { key: 'name', label: 'Name' },
@@ -27,11 +36,13 @@ const COLUMNS = [
 ];
 
 export default function ResultsPage() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const batchId = searchParams.get('batch');
 
   const [searchTerm, setSearchTerm] = useState('');
   const [results, setResults] = useState<any[]>([]);
+  const [batches, setBatches] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isExporting, setIsExporting] = useState(false);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
@@ -47,6 +58,30 @@ export default function ResultsPage() {
   );
   const [itemsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    const fetchBatches = async () => {
+      try {
+        const result = await fetchApi('/batches');
+        if (result.success) {
+          // Filter only completed or exported batches for results
+          const completedBatches = result.data.filter((b: any) =>
+            b.status === 'completed' || b.status === 'exported'
+          );
+          setBatches(completedBatches);
+
+          // If no batch is selected but we have completed batches, pick the first one
+          if (!batchId && completedBatches.length > 0) {
+            router.replace(`/dashboard/results?batch=${completedBatches[0].id}`);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching batches:', error);
+      }
+    };
+
+    fetchBatches();
+  }, []);
 
   useEffect(() => {
     const fetchResults = async () => {
@@ -79,14 +114,15 @@ export default function ResultsPage() {
       const result = await fetchApi(`/batches/${batchId}/export`);
       if (result.success) {
         if (result.data.downloadUrl) {
-          setDownloadUrl(result.data.downloadUrl);
+          window.open(result.data.downloadUrl, '_blank');
+          toast.success("Excel generated and download started!");
         } else {
-          alert("Export triggered! Checking back soon...");
+          toast.success("Export triggered! We'll notify you when it's ready.");
         }
       }
     } catch (error: any) {
       console.error('Export error:', error);
-      alert(error.message);
+      toast.error(error.message);
     } finally {
       setIsExporting(false);
     }
@@ -130,17 +166,41 @@ export default function ResultsPage() {
   return (
     <div className="p-6 lg:p-8">
       <div className="mb-8 flex justify-between items-start">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">
-            Parsed Results
-          </h1>
-          <p className="text-muted-foreground">
-            View and manage extracted candidate data
-          </p>
+        <div className="flex flex-col md:flex-row md:items-center gap-4">
+          <div className="flex flex-col">
+            <h1 className="text-3xl font-bold text-foreground mb-2">
+              Parsed Results
+            </h1>
+            <p className="text-muted-foreground">
+              View and manage extracted candidate data
+            </p>
+          </div>
+
+          {batches.length > 0 && (
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-muted-foreground hidden sm:inline">Batch:</span>
+              <Select
+                value={batchId || ''}
+                onValueChange={(id) => router.push(`/dashboard/results?batch=${id}`)}
+              >
+                <SelectTrigger className="w-[200px] lg:w-[300px]">
+                  <SelectValue placeholder="Select a batch" />
+                </SelectTrigger>
+                <SelectContent>
+                  {batches.map((b) => (
+                    <SelectItem key={b.id} value={b.id}>
+                      {b.name || 'Untitled Batch'}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
         </div>
-        {!batchId && (
+
+        {!batchId && batches.length === 0 && !isLoading && (
           <div className="bg-amber-100 text-amber-800 px-4 py-2 rounded-lg text-sm border border-amber-200">
-            Please select a batch from the dashboard to view results
+            No completed batches found. Please process some resumes first.
           </div>
         )}
       </div>
@@ -162,19 +222,14 @@ export default function ResultsPage() {
             />
           </div>
           <div className="flex gap-2">
-            {downloadUrl ? (
-              <Button variant="default" asChild>
-                <a href={downloadUrl} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="w-4 h-4 mr-2" />
-                  Download CSV
-                </a>
-              </Button>
-            ) : (
-              <Button variant="outline" onClick={handleExport} disabled={!batchId || isExporting}>
-                {isExporting ? <Loader className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
-                {isExporting ? 'Exporting...' : 'Export to CSV'}
-              </Button>
-            )}
+            <Button
+              variant="outline"
+              onClick={handleExport}
+              disabled={!batchId || isExporting}
+            >
+              {isExporting ? <Loader className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
+              {isExporting ? 'Exporting...' : 'Export to Excel'}
+            </Button>
           </div>
         </div>
 

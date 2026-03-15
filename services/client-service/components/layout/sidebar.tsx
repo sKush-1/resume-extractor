@@ -22,7 +22,6 @@ const navItems = [
   { label: 'Upload Batch', href: '/dashboard/upload', icon: Upload },
   { label: 'Processing Jobs', href: '/dashboard/jobs', icon: Zap },
   { label: 'Results', href: '/dashboard/results', icon: BarChart3 },
-  { label: 'Exports', href: '/dashboard/exports', icon: Download },
   { label: 'Settings', href: '/dashboard/settings', icon: Settings },
 ];
 

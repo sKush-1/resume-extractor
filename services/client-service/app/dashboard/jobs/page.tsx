@@ -8,6 +8,14 @@ import { JobStatusCard } from '@/components/dashboard/job-status-card';
 import { Progress } from '@/components/ui/progress';
 import { Clock, ArrowRight, Loader, Download, CheckCircle2 } from 'lucide-react';
 import { fetchApi } from '@/lib/api';
+import { toast } from 'sonner';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 const STATUS_FILTERS = ['all', 'pending', 'processing', 'completed', 'failed'] as const;
 
@@ -17,6 +25,7 @@ export default function JobsPage() {
   const batchIdFromUrl = searchParams.get('id');
 
   const [batch, setBatch] = useState<any>(null);
+  const [batches, setBatches] = useState<any[]>([]);
   const [candidates, setCandidates] = useState<any[]>([]);
   const [selectedFilter, setSelectedFilter] = useState<typeof STATUS_FILTERS[number]>('all');
   const [isLoading, setIsLoading] = useState(true);
@@ -38,20 +47,22 @@ export default function JobsPage() {
     }
   }, []);
 
-  const fetchRecentBatch = useCallback(async () => {
+  const fetchAllBatches = useCallback(async () => {
     try {
       const result = await fetchApi('/batches');
-      if (result.success && result.data.length > 0) {
-        const mostRecent = result.data[0];
-        router.replace(`/dashboard/jobs?id=${mostRecent.id}`);
-      } else {
-        setIsLoading(false);
+      if (result.success) {
+        setBatches(result.data);
+        if (!batchIdFromUrl && result.data.length > 0) {
+          router.replace(`/dashboard/jobs?id=${result.data[0].id}`);
+        } else if (!batchIdFromUrl) {
+          setIsLoading(false);
+        }
       }
     } catch (error) {
-      console.error('Error fetching recent batch:', error);
+      console.error('Error fetching batches:', error);
       setIsLoading(false);
     }
-  }, [router]);
+  }, [batchIdFromUrl, router]);
 
   useEffect(() => {
     if (batchIdFromUrl) {
@@ -63,10 +74,11 @@ export default function JobsPage() {
       }, 5000);
 
       return () => clearInterval(interval);
-    } else {
-      fetchRecentBatch();
     }
-  }, [batchIdFromUrl, fetchBatchData, fetchRecentBatch]);
+
+    // Always fetch all batches for the selector
+    fetchAllBatches();
+  }, [batchIdFromUrl, fetchBatchData, fetchAllBatches]);
 
   const handleExport = async () => {
     if (!batchIdFromUrl) return;
@@ -77,11 +89,11 @@ export default function JobsPage() {
         if (result.data.downloadUrl) {
           window.open(result.data.downloadUrl, '_blank');
         } else {
-          alert("Export triggered! We'll notify you when it's ready.");
+          toast.success("Export triggered! We'll notify you when it's ready.");
         }
       }
     } catch (error: any) {
-      alert(error.message);
+      toast.error(error.message);
     } finally {
       setIsExporting(false);
     }
@@ -120,19 +132,45 @@ export default function JobsPage() {
 
   return (
     <div className="p-6 lg:p-8">
-      <div className="mb-8 flex justify-between items-end">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground mb-1">
-            Batch: {batch.name || 'Untitled'}
-          </h1>
-          <p className="text-muted-foreground text-sm">
-            Status: <span className="capitalize font-medium text-foreground">{batch.status}</span>
-          </p>
+      <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div className="flex flex-col md:flex-row md:items-center gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground mb-1">
+              Batch: {batch.name || 'Untitled'}
+            </h1>
+            <p className="text-muted-foreground text-sm">
+              Status: <span className="capitalize font-medium text-foreground">{batch.status}</span>
+            </p>
+          </div>
+
+          {batches.length > 0 && (
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-muted-foreground hidden sm:inline">Switch Batch:</span>
+              <Select
+                value={batchIdFromUrl || ''}
+                onValueChange={(id) => router.push(`/dashboard/jobs?id=${id}`)}
+              >
+                <SelectTrigger className="w-[200px] lg:w-[300px]">
+                  <SelectValue placeholder="Select a batch" />
+                </SelectTrigger>
+                <SelectContent>
+                  {batches.map((b) => (
+                    <SelectItem key={b.id} value={b.id}>
+                      <div className="flex flex-col">
+                        <span className="font-medium">{b.name || 'Untitled Batch'}</span>
+                        <span className="text-[10px] text-muted-foreground font-mono">{b.id}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
         </div>
         {isAllDone && (
           <Button onClick={handleExport} disabled={isExporting} className="bg-success hover:bg-success/90 text-white">
             {isExporting ? <Loader className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
-            Export results to CSV
+            Export results to Excel
           </Button>
         )}
       </div>
@@ -187,8 +225,8 @@ export default function JobsPage() {
             key={filter}
             onClick={() => setSelectedFilter(filter)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${selectedFilter === filter
-                ? 'bg-primary text-primary-foreground shadow-sm'
-                : 'bg-card border border-border text-muted-foreground hover:bg-muted/50'
+              ? 'bg-primary text-primary-foreground shadow-sm'
+              : 'bg-card border border-border text-muted-foreground hover:bg-muted/50'
               }`}
           >
             {filter.charAt(0).toUpperCase() + filter.slice(1)}
@@ -214,6 +252,8 @@ export default function JobsPage() {
               key={candidate.id}
               job={{
                 id: candidate.id,
+                batchId: batch.id,
+                batchName: batch.name,
                 fileName: candidate.file_key.split('/').pop() || 'Resume',
                 status: candidate.status,
                 progress: candidate.status === 'completed' ? 100 : candidate.status === 'processing' ? 50 : 0,

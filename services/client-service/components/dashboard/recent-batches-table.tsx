@@ -96,6 +96,9 @@ export function RecentBatchesTable() {
           <TableHeader>
             <TableRow className="border-b border-border">
               <TableHead className="text-foreground font-semibold">
+                Batch ID
+              </TableHead>
+              <TableHead className="text-foreground font-semibold">
                 Batch Name
               </TableHead>
               <TableHead className="text-foreground font-semibold">
@@ -125,6 +128,9 @@ export function RecentBatchesTable() {
                   key={batch.id}
                   className="border-b border-border hover:bg-muted/50 transition-colors"
                 >
+                  <TableCell className="text-muted-foreground font-mono text-xs">
+                    {batch.id.substring(0, 8)}...
+                  </TableCell>
                   <TableCell className="text-foreground font-medium">
                     {batch.name || 'Untitled Batch'}
                   </TableCell>

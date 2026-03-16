@@ -12,6 +12,7 @@ import { batchRoutes } from "./routes/batch.routes";
 
 const server: FastifyInstance = Fastify({
   logger: true,
+  bodyLimit: 500 * 1024 * 1024, // 500MB
 });
 
 interface HelloResponse {

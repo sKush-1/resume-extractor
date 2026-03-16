@@ -56,7 +56,7 @@ export function Sidebar() {
           <span className="font-semibold text-sm text-sidebar-foreground">
             BulkParser.com
           </span>
-          <span className="text-xs text-sidebar-foreground/60">Beta</span>
+          {/* <span className="text-xs text-sidebar-foreground/60">Beta</span> */}
         </div>
       </div>
 

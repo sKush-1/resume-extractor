@@ -45,10 +45,17 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
         }
     }
 
-    const data = await response.json();
+    let data;
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+        data = await response.json().catch(() => ({ error: 'Failed to parse JSON' }));
+    } else {
+        const text = await response.text();
+        data = { error: text.slice(0, 100) || `Server error ${response.status}` };
+    }
 
     if (!response.ok) {
-        throw new Error(data.error || data.message || 'Something went wrong');
+        throw new Error(data.error || data.message || `Request failed (${response.status})`);
     }
 
     return data;

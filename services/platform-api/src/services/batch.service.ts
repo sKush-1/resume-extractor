@@ -7,8 +7,8 @@ import path from "node:path";
 import { Batch, BatchStatus, Candidate } from "../interfaces/batches";
 import logger from "../utils/logger";
 
-const MAX_FREE_RESUMES_PER_DAY = 20;
-const MAX_FREE_FILE_SIZE_MB = 3;
+const MAX_FREE_RESUMES_PER_DAY = 500;
+const MAX_FREE_FILE_SIZE_MB = 50;
 
 export class BatchService {
     private s3Client: S3Client;

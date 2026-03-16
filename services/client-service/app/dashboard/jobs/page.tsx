@@ -287,6 +287,33 @@ function JobsPageContent() {
     );
   }
 
+  if (!batch) {
+    return (
+      <div className="p-12 text-center">
+        <Loader className="w-8 h-8 animate-spin text-primary mx-auto mb-4" />
+        <h2 className="text-xl font-semibold mb-2">Loading batch data...</h2>
+        <p className="text-muted-foreground">This may take a moment for large batches.</p>
+      </div>
+    );
+  }
+
+  if (!batch) {
+    return (
+      <div className="p-12 text-center">
+        <Loader className="w-8 h-8 animate-spin text-primary mx-auto mb-4" />
+        <h2 className="text-xl font-semibold mb-2">Loading batch data...</h2>
+        <p className="text-muted-foreground">This may take a moment for large batches.</p>
+        <Button
+          variant="outline"
+          className="mt-4"
+          onClick={() => router.push('/dashboard/jobs')}
+        >
+          View all jobs
+        </Button>
+      </div>
+    );
+  }
+
   const filteredCandidates = candidates.filter(c =>
     selectedFilter === 'all' || c.status === selectedFilter
   );

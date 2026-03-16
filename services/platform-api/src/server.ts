@@ -74,9 +74,9 @@ const start = async () => {
     });
 
     await server.register(fastifyRateLimit, {
-      max: 100, // Default global limit
-      timeWindow: "1 minute",
-      redis: server.redis, // Use the decorated redis instance
+      max: Number(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
+      timeWindow: Number(process.env.RATE_LIMIT_WINDOW_MS) || 60000,
+      redis: server.redis,
       errorResponseBuilder: (request, context) => {
         return {
           statusCode: 429,

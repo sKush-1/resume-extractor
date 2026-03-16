@@ -65,6 +65,9 @@ importers:
       pg:
         specifier: ^8.16.3
         version: 8.16.3
+      winston:
+        specifier: ^3.19.0
+        version: 3.19.0
     devDependencies:
       '@types/bcrypt':
         specifier: ^6.0.0
@@ -87,9 +90,6 @@ importers:
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
-      winston:
-        specifier: ^3.19.0
-        version: 3.19.0
 
 packages:
 

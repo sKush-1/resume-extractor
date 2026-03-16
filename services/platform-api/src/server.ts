@@ -52,10 +52,10 @@ const start = async () => {
     await server.register(multipart, {
       limits: {
         fieldNameSize: 100,
-        fieldSize: 1024 * 1024, // 1MB for field values
-        fields: 20,
-        fileSize: 10 * 1024 * 1024, // 10MB per resume
-        files: 20, // Match the daily limit
+        fieldSize: 10 * 1024 * 1024, // 10MB for field values
+        fields: 50,
+        fileSize: 500 * 1024 * 1024, // 500MB per batch/file
+        files: 50,
       },
     });
 

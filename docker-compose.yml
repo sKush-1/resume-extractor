@@ -141,7 +141,7 @@ services:
       context: .
       dockerfile: services/client-service/Dockerfile
       args:
-        - NEXT_PUBLIC_API_URL=http://localhost:4072/api/v1
+        - NEXT_PUBLIC_API_URL=https://platformapi.bulkparser.com/api/v1
     ports:
       - "127.0.0.1:3072:3000"
     env_file:

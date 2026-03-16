@@ -72,7 +72,11 @@ export class BatchService {
             });
         }
 
-        // 2. Validate file sizes
+        // 2. Validate file sizes and sanitize metrics
+        const sanitizedMetrics = Array.isArray(metrics)
+            ? metrics.map(m => ({ ...m, name: m.name.trim() }))
+            : [];
+
         for (const file of filesToProcess) {
             const sizeMB = file.data.length / (1024 * 1024);
             if (sizeMB > MAX_FREE_FILE_SIZE_MB) {
@@ -85,7 +89,7 @@ export class BatchService {
             `INSERT INTO batches (user_id, name, status, resume_count, metrics)
        VALUES ($1, $2, 'processing', $3, $4)
        RETURNING *`,
-            [userId, name, filesToProcess.length, JSON.stringify(metrics)]
+            [userId, name, filesToProcess.length, JSON.stringify(sanitizedMetrics)]
         );
         const batch = batchResult.rows[0];
 
@@ -123,7 +127,7 @@ export class BatchService {
                     file_key: fileKey,
                     file_name: file.filename,
                     file_type: ext.replace(".", ""),
-                    metrics,
+                    metrics: sanitizedMetrics,
                 },
             });
         }

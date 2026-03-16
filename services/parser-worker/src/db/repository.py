@@ -25,15 +25,51 @@ def update_candidate_data(conn, candidate_id: str, data: dict):
         candidate_id: UUID of the candidate record
         data: Parsed candidate data dict
     """
+    # Normalize keys to match DB columns
+    lowered_data = {k.strip().lower(): v for k, v in data.items()}
+    
+    # Extract standard fields
+    name = str(lowered_data.get("name", ""))
+    email = str(lowered_data.get("email", ""))
+    phone = str(lowered_data.get("phone", ""))
+    location = str(lowered_data.get("location", ""))
+    exp = str(lowered_data.get("experience", "") or lowered_data.get("experience_years", ""))
+    
+    # Handle array fields
+    def to_list(val):
+        if isinstance(val, list): return val
+        if not val: return []
+        return [s.strip() for s in str(val).split(",") if s.strip()]
+
+    skills = to_list(lowered_data.get("skills", []))
+    edu = to_list(lowered_data.get("education", []))
+    cos = to_list(lowered_data.get("companies", []))
+
     with conn.cursor() as cur:
         cur.execute(
             """
             UPDATE candidates SET
+                name = %s,
+                email = %s,
+                phone = %s,
+                location = %s,
+                experience_years = %s,
+                skills = %s,
+                education = %s,
+                companies = %s,
                 parsed_data = %s,
                 status = 'completed'
             WHERE id = %s
             """,
             (
+                name,
+                email,
+                phone,
+                location,
+                exp,
+                skills,
+                edu,
+                cos,
                 json.dumps(data),
                 candidate_id,
             ),

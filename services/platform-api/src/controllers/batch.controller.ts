@@ -44,7 +44,10 @@ export const uploadBatch = async (
             return reply.code(400).send({ error: "No files uploaded" });
         }
 
-        const batch = await batchService.uploadBatch(userId, batchName, files, metrics);
+        const ip = (request.headers["x-forwarded-for"] as string) || request.ip;
+        const fingerprint = request.headers["x-fingerprint"] as string || "";
+
+        const batch = await batchService.uploadBatch(userId, batchName, files, metrics, ip, fingerprint);
         return reply.code(201).send({ success: true, data: batch });
     } catch (error: any) {
         logger.error("Error in uploadBatch controller", error);

@@ -7,8 +7,9 @@ import path from "node:path";
 import { Batch, BatchStatus, Candidate } from "../interfaces/batches";
 import logger from "../utils/logger";
 
-const MAX_FREE_RESUMES_PER_DAY = 500;
-const MAX_FREE_FILE_SIZE_MB = 50;
+const MAX_BATCHES_PER_DAY = 3;
+const MAX_RESUMES_PER_BATCH = 20;
+const MAX_FREE_FILE_SIZE_MB = 20;
 
 export class BatchService {
     private s3Client: S3Client;
@@ -40,39 +41,39 @@ export class BatchService {
         });
     }
 
-    async getDailyUsage(userId: string): Promise<number> {
+    async getDailyBatchCount(userId: string, ip: string, fingerprint?: string): Promise<number> {
         const result = await pool.query(
-            `SELECT COALESCE(SUM(resume_count), 0) as count 
+            `SELECT COUNT(*) as count 
        FROM batches 
-       WHERE user_id = $1 AND created_at > CURRENT_DATE`,
-            [userId]
+       WHERE (user_id = $1 OR ip_address = $2 OR fingerprint = $3) 
+       AND created_at > CURRENT_DATE`,
+            [userId, ip, fingerprint]
         );
         return parseInt(result.rows[0].count, 10);
     }
 
-    async uploadBatch(userId: string, name: string, files: any[], metrics: any[] = []): Promise<Batch> {
-        // 1. Check daily limit and auto-discard excess
-        const currentUsage = await this.getDailyUsage(userId);
-        const remainingQuota = MAX_FREE_RESUMES_PER_DAY - currentUsage;
+    async uploadBatch(
+        userId: string,
+        name: string,
+        files: any[],
+        metrics: any[] = [],
+        ip: string = "",
+        fingerprint: string = ""
+    ): Promise<Batch> {
+        // 1. Check daily batch limit
+        const dailyBatches = await this.getDailyBatchCount(userId, ip, fingerprint);
+        if (dailyBatches >= MAX_BATCHES_PER_DAY) {
+            throw new Error(`Daily limit reached (${MAX_BATCHES_PER_DAY} batches per day). Please try again tomorrow.`);
+        }
 
-        if (remainingQuota <= 0) {
-            throw new Error(`Daily limit reached (${MAX_FREE_RESUMES_PER_DAY}/20). Please try again tomorrow.`);
+        // 2. Validate batch size (max 20 resumes)
+        if (files.length > MAX_RESUMES_PER_BATCH) {
+            throw new Error(`Maximum ${MAX_RESUMES_PER_BATCH} resumes allowed per batch.`);
         }
 
         let filesToProcess = files;
-        let discardedCount = 0;
 
-        if (files.length > remainingQuota) {
-            discardedCount = files.length - remainingQuota;
-            filesToProcess = files.slice(0, remainingQuota);
-            logger.warn(`User ${userId} exceeded quota. Discarding ${discardedCount} resumes.`, {
-                batchName: name,
-                total: files.length,
-                processed: filesToProcess.length
-            });
-        }
-
-        // 2. Validate file sizes and sanitize metrics
+        // 3. Validate file sizes and sanitize metrics
         const sanitizedMetrics = Array.isArray(metrics)
             ? metrics.map(m => ({ ...m, name: m.name.trim() }))
             : [];
@@ -84,12 +85,12 @@ export class BatchService {
             }
         }
 
-        // 3. Create batch record
+        // 4. Create batch record
         const batchResult = await pool.query(
-            `INSERT INTO batches (user_id, name, status, resume_count, metrics)
-       VALUES ($1, $2, 'processing', $3, $4)
+            `INSERT INTO batches (user_id, name, status, resume_count, metrics, ip_address, fingerprint)
+       VALUES ($1, $2, 'processing', $3, $4, $5, $6)
        RETURNING *`,
-            [userId, name, filesToProcess.length, JSON.stringify(sanitizedMetrics)]
+            [userId, name, filesToProcess.length, JSON.stringify(sanitizedMetrics), ip, fingerprint]
         );
         const batch = batchResult.rows[0];
 

@@ -6,17 +6,19 @@ export async function userEmailRegisterService(
   name: string,
   password: string,
   deviceId?: string,
+  ip?: string,
+  fingerprint?: string,
 ) {
   const client = await pool.connect();
   try {
-    if (deviceId) {
-      const deviceCount = await client.query(
-        "SELECT COUNT(*) FROM users WHERE device_id = $1",
-        [deviceId]
-      );
-      if (parseInt(deviceCount.rows[0].count, 10) >= 2) {
-        throw new Error("Maximum accounts per device reached.");
-      }
+    const identityCheck = await client.query(
+      `SELECT COUNT(*) FROM users 
+       WHERE device_id = $1 OR last_ip = $2 OR fingerprint = $3`,
+      [deviceId || 'none', ip || 'none', fingerprint || 'none']
+    );
+
+    if (parseInt(identityCheck.rows[0].count, 10) >= 2) {
+      throw new Error("Maximum accounts per identity reached. BulkParser allows only 2 accounts per user.");
     }
 
     const passwordHash = await hashPassword(password);
@@ -24,10 +26,10 @@ export async function userEmailRegisterService(
     await client.query("BEGIN");
 
     const insertUserResult = await client.query(
-      `INSERT INTO users (email, name, device_id)
-       VALUES ($1, $2, $3)
+      `INSERT INTO users (email, name, device_id, last_ip, fingerprint)
+       VALUES ($1, $2, $3, $4, $5)
        RETURNING id`,
-      [email, name, deviceId],
+      [email, name, deviceId, ip, fingerprint],
     );
 
     const userId = insertUserResult.rows[0].id;
@@ -99,7 +101,9 @@ export async function upsertGoogleUser(
   email: string,
   name: string,
   googleId: string,
-  deviceId?: string
+  deviceId?: string,
+  ip?: string,
+  fingerprint?: string,
 ) {
   const client = await pool.connect();
   try {
@@ -114,22 +118,27 @@ export async function upsertGoogleUser(
     if (userRes.rows.length > 0) {
       // User exists
       userId = userRes.rows[0].id;
+      // Update last IP and fingerprint
+      await client.query(
+        "UPDATE users SET last_ip = $1, fingerprint = $2 WHERE id = $3",
+        [ip, fingerprint, userId]
+      );
     } else {
-      // Check device limit
-      if (deviceId) {
-        const deviceCount = await client.query(
-          "SELECT COUNT(*) FROM users WHERE device_id = $1",
-          [deviceId]
-        );
-        if (parseInt(deviceCount.rows[0].count, 10) >= 2) {
-          throw new Error("Maximum accounts per device reached.");
-        }
+      // Check identity limit
+      const identityCheck = await client.query(
+        `SELECT COUNT(*) FROM users 
+         WHERE device_id = $1 OR last_ip = $2 OR fingerprint = $3`,
+        [deviceId || 'none', ip || 'none', fingerprint || 'none']
+      );
+
+      if (parseInt(identityCheck.rows[0].count, 10) >= 2) {
+        throw new Error("Maximum accounts per identity reached. BulkParser allows only 2 accounts per user.");
       }
 
       // Create User
       const insertUser = await client.query(
-        `INSERT INTO users (email, name, device_id) VALUES ($1, $2, $3) RETURNING id`,
-        [email, name, deviceId]
+        `INSERT INTO users (email, name, device_id, last_ip, fingerprint) VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+        [email, name, deviceId, ip, fingerprint]
       );
       userId = insertUser.rows[0].id;
     }

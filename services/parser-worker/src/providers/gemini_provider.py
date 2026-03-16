@@ -4,7 +4,7 @@ Google Gemini API provider adapter.
 
 import requests
 from .base import AIProvider
-from .ollama_provider import EXTRACTION_SYSTEM_PROMPT
+from .prompt_builder import build_extraction_prompt
 from ..logger import create_logger
 from ..config import AI_TIMEOUT
 
@@ -18,14 +18,14 @@ class GeminiProvider(AIProvider):
         self._api_key = api_key
         self._model = model
 
-    def extract_resume_data(self, text: str) -> str:
+    def extract_resume_data(self, text: str, metrics: list = None) -> str:
         """Send text to Gemini for parsing."""
         url = (
             f"https://generativelanguage.googleapis.com/v1beta/models/"
             f"{self._model}:generateContent?key={self._api_key}"
         )
 
-        prompt = f"{EXTRACTION_SYSTEM_PROMPT}\n\nExtract structured data from this resume:\n\n{text}"
+        prompt = f"{build_extraction_prompt(metrics)}\n\nExtract structured data from this resume:\n\n{text}"
 
         response = requests.post(
             url,

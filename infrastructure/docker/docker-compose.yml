@@ -137,11 +137,26 @@ services:
       DB_PORT: 5432
       redisHost: redis
       redisPORT: 6379
+      S3_ENDPOINT: http://minio:9000
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
+    restart: unless-stopped
+
+  client-service:
+    build:
+      context: ../../
+      dockerfile: services/client-service/Dockerfile
+    ports:
+      - "3000:3000"
+    env_file:
+      - ../../services/client-service/.env
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:4000/api/v1
+    depends_on:
+      - api-gateway
     restart: unless-stopped
 
 volumes:

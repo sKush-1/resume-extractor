@@ -2,7 +2,7 @@ import { UploadForm } from '@/components/upload/upload-form';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Upload Batch - ResumeParse',
+  title: 'Upload Batch - Bulk Parser',
   description: 'Upload resumes for batch processing',
 };
 

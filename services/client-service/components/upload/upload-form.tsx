@@ -9,6 +9,7 @@ import { FileList } from './file-list';
 import { ArrowRight, Loader } from 'lucide-react';
 import { fetchApi } from '@/lib/api';
 import { toast } from 'sonner';
+import { MetricsConfig, Metric, DEFAULT_METRICS } from './metrics-config';
 
 interface UploadFile {
   id: string;
@@ -21,6 +22,7 @@ interface UploadFile {
 export function UploadForm() {
   const router = useRouter();
   const [batchName, setBatchName] = useState('');
+  const [metrics, setMetrics] = useState<Metric[]>(DEFAULT_METRICS);
   const [uploadedFiles, setUploadedFiles] = useState<UploadFile[]>([]);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -51,6 +53,7 @@ export function UploadForm() {
     try {
       const formData = new FormData();
       formData.append('name', batchName);
+      formData.append('metrics', JSON.stringify(metrics.map(m => ({ name: m.name, description: m.description }))));
       uploadedFiles.forEach((f) => {
         formData.append('resumes', f.file);
       });
@@ -60,12 +63,8 @@ export function UploadForm() {
         body: formData,
       });
 
-      // Redirect to jobs page with specific batch ID
-      if (result.success && result.data.id) {
-        router.push(`/dashboard/jobs?id=${result.data.id}`);
-      } else {
-        router.push('/dashboard/jobs');
-      }
+      // Redirect to jobs list
+      router.push('/dashboard/jobs');
     } catch (error: any) {
       console.error('Upload error:', error);
       setGlobalError(error.message);
@@ -111,6 +110,8 @@ export function UploadForm() {
           Give this batch a descriptive name for easy tracking
         </p>
       </div>
+
+      <MetricsConfig metrics={metrics} onChange={setMetrics} />
 
       <div>
         <label className="block text-sm font-medium text-foreground mb-3">

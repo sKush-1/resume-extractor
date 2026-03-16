@@ -9,7 +9,7 @@ class AIProvider(ABC):
     """Interface for AI resume data extraction providers."""
 
     @abstractmethod
-    def extract_resume_data(self, text: str) -> str:
+    def extract_resume_data(self, text: str, metrics: list = None) -> str:
         """
         Send resume text to AI model and get raw response.
 

@@ -27,8 +27,7 @@ def get_candidates_by_batch(conn, batch_id: str) -> list[dict]:
     with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
         cur.execute(
             """
-            SELECT name, email, phone, skills, experience_years,
-                   education, companies, location
+            SELECT parsed_data
             FROM candidates
             WHERE batch_id = %s AND status = 'completed'
             ORDER BY created_at
@@ -36,6 +35,17 @@ def get_candidates_by_batch(conn, batch_id: str) -> list[dict]:
             (batch_id,),
         )
         return cur.fetchall()
+
+
+def get_batch_metrics(conn, batch_id: str) -> list[dict]:
+    """Fetch the metrics configuration for a batch."""
+    with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+        cur.execute(
+            "SELECT metrics FROM batches WHERE id = %s",
+            (batch_id,),
+        )
+        row = cur.fetchone()
+        return row["metrics"] if row and row["metrics"] else []
 
 
 def update_batch_export(conn, batch_id: str, export_file_key: str):

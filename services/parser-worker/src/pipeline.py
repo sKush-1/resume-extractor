@@ -44,7 +44,8 @@ class ResumePipeline:
         job_id = job_data["job_id"]
         batch_id = job_data["batch_id"]
         file_key = job_data["file_key"]
-        file_type = job_data["file_type"]
+        file_type = job_data.get("file_type")
+        metrics = job_data.get("metrics")
 
         logger.info("Processing job", extra={"job_id": job_id, "file_key": file_key})
 
@@ -56,18 +57,17 @@ class ResumePipeline:
             raw_text = extract_text(file_bytes, file_type)
 
             # 3. Send to AI for parsing
-            ai_response = self._ai.extract_resume_data(raw_text)
+            ai_response = self._ai.extract_resume_data(raw_text, metrics)
 
             # 4. Validate response
             candidate_data = parse_ai_response(ai_response)
 
             # 5. Store in database
-            update_candidate_data(self._conn, job_id, candidate_data.model_dump())
+            update_candidate_data(self._conn, job_id, candidate_data)
             increment_batch_processed(self._conn, batch_id)
 
             logger.info("Job completed", extra={
                 "job_id": job_id,
-                "candidate_name": candidate_data.name,
             })
 
         except Exception as e:

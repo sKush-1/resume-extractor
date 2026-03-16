@@ -16,6 +16,7 @@ export const uploadBatch = async (
 
         const parts = request.parts();
         let batchName = "Untitled Batch";
+        let metrics: any[] = [];
         const files: any[] = [];
 
         for await (const part of parts) {
@@ -29,6 +30,12 @@ export const uploadBatch = async (
             } else {
                 if (part.fieldname === "name") {
                     batchName = (part as any).value;
+                } else if (part.fieldname === "metrics") {
+                    try {
+                        metrics = JSON.parse((part as any).value);
+                    } catch (e) {
+                        logger.error("Failed to parse metrics", e);
+                    }
                 }
             }
         }
@@ -37,7 +44,7 @@ export const uploadBatch = async (
             return reply.code(400).send({ error: "No files uploaded" });
         }
 
-        const batch = await batchService.uploadBatch(userId, batchName, files);
+        const batch = await batchService.uploadBatch(userId, batchName, files, metrics);
         return reply.code(201).send({ success: true, data: batch });
     } catch (error: any) {
         logger.error("Error in uploadBatch controller", error);

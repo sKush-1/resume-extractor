@@ -4,7 +4,7 @@ OpenAI API provider adapter.
 
 import requests
 from .base import AIProvider
-from .ollama_provider import EXTRACTION_SYSTEM_PROMPT
+from .prompt_builder import build_extraction_prompt
 from ..logger import create_logger
 from ..config import AI_TIMEOUT
 
@@ -18,7 +18,7 @@ class OpenAIProvider(AIProvider):
         self._api_key = api_key
         self._model = model
 
-    def extract_resume_data(self, text: str) -> str:
+    def extract_resume_data(self, text: str, metrics: list = None) -> str:
         """Send text to OpenAI for parsing."""
         response = requests.post(
             "https://api.openai.com/v1/chat/completions",
@@ -29,7 +29,7 @@ class OpenAIProvider(AIProvider):
             json={
                 "model": self._model,
                 "messages": [
-                    {"role": "system", "content": EXTRACTION_SYSTEM_PROMPT},
+                    {"role": "system", "content": build_extraction_prompt(metrics)},
                     {"role": "user", "content": f"Extract structured data from this resume:\n\n{text}"},
                 ],
                 "temperature": 0.1,

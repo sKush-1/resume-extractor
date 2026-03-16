@@ -4,6 +4,7 @@ Database repository for storing parsed candidate data.
 
 import psycopg2
 import psycopg2.extras
+import json
 from .. import config
 from ..logger import create_logger
 
@@ -28,21 +29,12 @@ def update_candidate_data(conn, candidate_id: str, data: dict):
         cur.execute(
             """
             UPDATE candidates SET
-                name = %s, email = %s, phone = %s,
-                skills = %s, experience_years = %s,
-                education = %s, companies = %s,
-                location = %s, status = 'completed'
+                parsed_data = %s,
+                status = 'completed'
             WHERE id = %s
             """,
             (
-                data["name"],
-                data["email"],
-                data["phone"],
-                data["skills"],
-                data["experience_years"],
-                data["education"],
-                data["companies"],
-                data["location"],
+                json.dumps(data),
                 candidate_id,
             ),
         )

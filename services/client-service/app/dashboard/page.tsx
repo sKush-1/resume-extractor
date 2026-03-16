@@ -71,31 +71,30 @@ export default function DashboardPage() {
         </Button>
       </div>
 
-      {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <StatCard
           icon={BarChart3}
-          label="Total Resumes"
-          value={stats?.totalResumes?.toLocaleString() || '0'}
-          description="All time"
+          label="Total Jobs"
+          value={stats?.totalBatches || '0'}
+          description="Total pipelines created"
         />
         <StatCard
           icon={Zap}
-          label="Active Batches"
+          label="Active Jobs"
           value={stats?.activeBatches || '0'}
           description="Currently processing"
         />
         <StatCard
           icon={CheckCircle2}
-          label="Completed Batches"
+          label="Completed Jobs"
           value={stats?.completedBatches || '0'}
           description="Successfully processed"
         />
         <StatCard
           icon={Clock}
-          label="Avg Processing Time"
-          value={`${stats?.avgProcessingTime || '0'}m`}
-          description="Per resume"
+          label="Active Resumes"
+          value={stats?.totalResumes?.toLocaleString() || '0'}
+          description="Total resumes processed"
         />
       </div>
 

@@ -8,7 +8,7 @@ import boto3
 from botocore.config import Config as BotoConfig
 
 from . import config
-from .db import get_candidates_by_batch, update_batch_export
+from .db import get_candidates_by_batch, update_batch_export, get_batch_metrics
 
 import json
 import logging
@@ -88,18 +88,20 @@ def generate_and_upload_excel(conn, batch_id: str) -> str:
         raise ValueError(f"No completed candidates for batch {batch_id}")
 
     # 2. Build DataFrame
+    metrics = get_batch_metrics(conn, batch_id)
+    
     rows = []
     for c in candidates:
-        rows.append({
-            "Name": c["name"],
-            "Email": c["email"],
-            "Phone": c["phone"],
-            "Skills": _format_array_field(c["skills"]),
-            "Experience": c["experience_years"],
-            "Education": _format_array_field(c["education"]),
-            "Companies": _format_array_field(c["companies"]),
-            "Location": c["location"],
-        })
+        data = c["parsed_data"]
+        row = {}
+        for metric in metrics:
+            metric_name = metric["name"]
+            value = data.get(metric_name, "")
+            # Format list values as comma-separated strings
+            if isinstance(value, list):
+                value = ", ".join(str(v) for v in value if v)
+            row[metric_name.capitalize()] = value
+        rows.append(row)
 
     df = pd.DataFrame(rows)
 

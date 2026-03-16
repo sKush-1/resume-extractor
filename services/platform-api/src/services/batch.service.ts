@@ -50,7 +50,7 @@ export class BatchService {
         return parseInt(result.rows[0].count, 10);
     }
 
-    async uploadBatch(userId: string, name: string, files: any[]): Promise<Batch> {
+    async uploadBatch(userId: string, name: string, files: any[], metrics: any[] = []): Promise<Batch> {
         // 1. Check daily limit and auto-discard excess
         const currentUsage = await this.getDailyUsage(userId);
         const remainingQuota = MAX_FREE_RESUMES_PER_DAY - currentUsage;
@@ -82,10 +82,10 @@ export class BatchService {
 
         // 3. Create batch record
         const batchResult = await pool.query(
-            `INSERT INTO batches (user_id, name, status, resume_count)
-       VALUES ($1, $2, 'processing', $3)
+            `INSERT INTO batches (user_id, name, status, resume_count, metrics)
+       VALUES ($1, $2, 'processing', $3, $4)
        RETURNING *`,
-            [userId, name, filesToProcess.length]
+            [userId, name, filesToProcess.length, JSON.stringify(metrics)]
         );
         const batch = batchResult.rows[0];
 
@@ -123,6 +123,7 @@ export class BatchService {
                     file_key: fileKey,
                     file_name: file.filename,
                     file_type: ext.replace(".", ""),
+                    metrics,
                 },
             });
         }
@@ -256,8 +257,13 @@ export class BatchService {
         );
 
         const stats = statsResult.rows[0];
+        const totalBatchesResult = await pool.query(
+            `SELECT COUNT(*) as count FROM batches WHERE user_id = $1`,
+            [userId]
+        );
 
         return {
+            totalBatches: parseInt(totalBatchesResult.rows[0].count, 10),
             totalResumes: parseInt(stats.totalResumes, 10),
             activeBatches: parseInt(stats.activeBatches, 10),
             completedBatches: parseInt(stats.completedBatches, 10),

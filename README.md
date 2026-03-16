@@ -1,4 +1,4 @@
-# Resume to Excel ETL Platform
+# Bulk Parser (bulkparser.com)
 
 A production-grade pipeline that batch-processes up to **1000 resumes** (PDF/DOCX/TXT), extracts structured candidate data using AI, and exports results to Excel.
 

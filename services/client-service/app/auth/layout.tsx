@@ -9,9 +9,9 @@ export default function AuthLayout({
         {/* Logo */}
         <div className="flex items-center justify-center gap-2 mb-8">
           <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm">
-            RP
+            BP
           </div>
-          <span className="font-semibold text-foreground">ResumeParse</span>
+          <span className="font-semibold text-foreground">BulkParser.com</span>
         </div>
 
         {/* Content */}

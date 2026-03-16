@@ -11,9 +11,9 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm">
-              RP
+              BP
             </div>
-            <span className="font-semibold text-foreground">ResumeParse</span>
+            <span className="font-semibold text-foreground">BulkParser.com</span>
           </div>
           <div className="flex items-center gap-4">
             <Link
@@ -240,11 +240,10 @@ export default function LandingPage() {
             ].map((plan, index) => (
               <div
                 key={index}
-                className={`rounded-xl border p-8 ${
-                  plan.highlight
+                className={`rounded-xl border p-8 ${plan.highlight
                     ? 'border-primary bg-primary/5 relative'
                     : 'border-border bg-background'
-                }`}
+                  }`}
               >
                 {plan.highlight && (
                   <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">
@@ -293,7 +292,7 @@ export default function LandingPage() {
             Ready to Transform Your Hiring?
           </h2>
           <p className="text-lg mb-8 text-primary-foreground/90 max-w-2xl mx-auto">
-            Join hundreds of companies that trust ResumeParse to streamline their recruitment process.
+            Join hundreds of companies that trust BulkParser.com to streamline their recruitment process.
           </p>
           <Button asChild size="lg" variant="secondary">
             <Link href="/auth/signup">

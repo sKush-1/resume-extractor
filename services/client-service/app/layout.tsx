@@ -7,12 +7,12 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'ResumeParse - AI-Powered Resume Parsing Platform',
+  title: 'BulkParser.com - AI-Powered Resume Parsing Platform',
   description: 'Parse, analyze, and extract structured data from resumes with AI-powered intelligence. Perfect for recruiters and HR teams.',
   keywords: ['resume parsing', 'ATS', 'recruitment', 'resume analysis', 'hiring'],
-  authors: [{ name: 'ResumeParse' }],
-  creator: 'ResumeParse',
-  publisher: 'ResumeParse',
+  authors: [{ name: 'BulkParser.com' }],
+  creator: 'BulkParser.com',
+  publisher: 'BulkParser.com',
   icons: {
     icon: [
       {
@@ -33,9 +33,9 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://resumeparse.app',
-    siteName: 'ResumeParse',
-    title: 'ResumeParse - AI-Powered Resume Parsing Platform',
+    url: 'https://bulkparser.com',
+    siteName: 'BulkParser.com',
+    title: 'BulkParser.com - AI-Powered Resume Parsing Platform',
     description: 'Parse, analyze, and extract structured data from resumes with AI-powered intelligence.',
   },
 }

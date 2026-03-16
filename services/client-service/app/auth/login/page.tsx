@@ -3,8 +3,8 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 
 export const metadata: Metadata = {
-  title: 'Sign In - ResumeParse',
-  description: 'Sign in to your ResumeParse account',
+  title: 'Sign In - BulkParser.com',
+  description: 'Sign in to your BulkParser.com account',
 };
 
 export default function LoginPage() {

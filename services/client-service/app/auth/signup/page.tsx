@@ -2,8 +2,8 @@ import { SignupForm } from '@/components/forms/signup-form';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Create Account - ResumeParse',
-  description: 'Create a new ResumeParse account',
+  title: 'Create Account - BulkParser.com',
+  description: 'Create a new BulkParser.com account',
 };
 
 export default function SignupPage() {

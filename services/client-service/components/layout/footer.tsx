@@ -12,9 +12,9 @@ export function Footer() {
           <div className="md:col-span-1">
             <div className="flex items-center gap-2 mb-4">
               <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm">
-                RP
+                BP
               </div>
-              <span className="font-semibold text-foreground">ResumeParse</span>
+              <span className="font-semibold text-foreground">BulkParser.com</span>
             </div>
             <p className="text-sm text-muted-foreground">
               Parse resumes with AI-powered intelligence.
@@ -91,7 +91,7 @@ export function Footer() {
         {/* Bottom */}
         <div className="border-t border-border pt-8 flex flex-col md:flex-row items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            © {currentYear} ResumeParse. All rights reserved.
+            © {currentYear} BulkParser.com. All rights reserved.
           </p>
           <div className="flex items-center gap-4 mt-4 md:mt-0">
             <Link

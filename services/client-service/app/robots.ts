@@ -4,7 +4,7 @@ export default function robots(): MetadataRoute.Robots {
     return {
         rules: {
             userAgent: '*',
-            allow: '/',
+            allow: ['/', '/auth/signup', '/auth/login'],
             disallow: ['/dashboard/', '/api/', '/auth/'],
         },
         sitemap: 'https://bulkparser.com/sitemap.xml',

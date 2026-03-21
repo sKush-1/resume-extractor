@@ -10,12 +10,12 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Brand */}
           <div className="md:col-span-1">
-            <div className="flex items-center gap-2 mb-4">
+            <Link href="/" className="flex items-center gap-2 mb-4 hover:opacity-80 transition-opacity">
               <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm">
                 BP
               </div>
               <span className="font-semibold text-foreground">BulkParser.com</span>
-            </div>
+            </Link>
             <p className="text-sm text-muted-foreground">
               Parse resumes with AI-powered intelligence.
             </p>
@@ -48,7 +48,7 @@ export function Footer() {
             <h4 className="font-semibold text-foreground mb-4 text-sm">Company</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/about" className="text-muted-foreground hover:text-foreground transition-colors">
                   About
                 </Link>
               </li>
@@ -70,17 +70,17 @@ export function Footer() {
             <h4 className="font-semibold text-foreground mb-4 text-sm">Legal</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/privacy" className="text-muted-foreground hover:text-foreground transition-colors">
                   Privacy
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/terms" className="text-muted-foreground hover:text-foreground transition-colors">
                   Terms
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/contact" className="text-muted-foreground hover:text-foreground transition-colors">
                   Contact
                 </Link>
               </li>

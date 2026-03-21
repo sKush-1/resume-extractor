@@ -1,33 +1,13 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Footer } from '@/components/layout/footer';
+import { Navbar } from '@/components/layout/navbar';
 import { CheckCircle2, Zap, BarChart3, FileText, ArrowRight } from 'lucide-react';
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background">
-      {/* Navigation */}
-      <nav className="border-b border-border sticky top-0 z-40 bg-background/95 backdrop-blur">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm">
-              BP
-            </div>
-            <span className="font-semibold text-foreground">BulkParser.com</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <Link
-              href="/auth/login"
-              className="text-sm text-foreground hover:text-muted-foreground transition-colors"
-            >
-              Sign In
-            </Link>
-            <Button asChild>
-              <Link href="/auth/signup">Get Started</Link>
-            </Button>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* Hero Section */}
       <section className="max-w-6xl mx-auto px-6 py-20 md:py-32">
@@ -241,8 +221,8 @@ export default function LandingPage() {
               <div
                 key={index}
                 className={`rounded-xl border p-8 ${plan.highlight
-                    ? 'border-primary bg-primary/5 relative'
-                    : 'border-border bg-background'
+                  ? 'border-primary bg-primary/5 relative'
+                  : 'border-border bg-background'
                   }`}
               >
                 {plan.highlight && (

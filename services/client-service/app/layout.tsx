@@ -26,15 +26,18 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
+  manifest: '/manifest.json',
   icons: {
     icon: [
       {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
+        url: '/favicon-32x32.png',
+        sizes: '32x32',
+        type: 'image/png',
       },
       {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
+        url: '/favicon-96x96.png',
+        sizes: '96x96',
+        type: 'image/png',
       },
       {
         url: '/icon.svg',
@@ -42,6 +45,11 @@ export const metadata: Metadata = {
       },
     ],
     apple: '/apple-icon.png',
+  },
+  appleWebApp: {
+    title: 'BulkParser',
+    statusBarStyle: 'default',
+    capable: true,
   },
   openGraph: {
     type: 'website',

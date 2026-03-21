@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Script from 'next/script'
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 
@@ -115,6 +116,19 @@ export default function RootLayout({
         <AuthProvider>
           {children}
         </AuthProvider>
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-6VR1NM3RLM"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-6VR1NM3RLM');
+          `}
+        </Script>
         <Toaster position="bottom-right" richColors />
       </body>
     </html>

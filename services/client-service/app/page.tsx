@@ -183,7 +183,7 @@ export default function LandingPage() {
             {[
               {
                 name: 'Starter',
-                price: '$99',
+                price: '$10',
                 description: 'Perfect for small teams',
                 features: [
                   'Up to 100 resumes/month',
@@ -194,7 +194,7 @@ export default function LandingPage() {
               },
               {
                 name: 'Professional',
-                price: '$499',
+                price: '$20.00',
                 description: 'For growing companies',
                 features: [
                   'Up to 1,000 resumes/month',

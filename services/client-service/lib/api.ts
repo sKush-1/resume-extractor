@@ -64,7 +64,15 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}) {
     }
 
     if (!response.ok) {
-        throw new Error(data.error || data.message || `Request failed (${response.status})`);
+        let errorMessage = `Request failed (${response.status})`;
+        if (typeof data.error === 'string') {
+            errorMessage = data.error;
+        } else if (data.message && typeof data.message === 'string') {
+            errorMessage = data.message;
+        } else if (data.error && typeof data.error !== 'boolean') {
+            errorMessage = String(data.error);
+        }
+        throw new Error(errorMessage);
     }
 
     return data;

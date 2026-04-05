@@ -13,7 +13,7 @@ export async function userEmailRegisterService(
   try {
     const identityCheck = await client.query(
       `SELECT COUNT(*) FROM users 
-       WHERE device_id = $1 OR last_ip = $2 OR fingerprint = $3`,
+       WHERE (device_id = $1 AND $1 != 'none') OR (last_ip = $2 AND $2 != 'none') OR (fingerprint = $3 AND $3 != 'none')`,
       [deviceId || 'none', ip || 'none', fingerprint || 'none']
     );
 
@@ -127,7 +127,7 @@ export async function upsertGoogleUser(
       // Check identity limit
       const identityCheck = await client.query(
         `SELECT COUNT(*) FROM users 
-         WHERE device_id = $1 OR last_ip = $2 OR fingerprint = $3`,
+         WHERE (device_id = $1 AND $1 != 'none') OR (last_ip = $2 AND $2 != 'none') OR (fingerprint = $3 AND $3 != 'none')`,
         [deviceId || 'none', ip || 'none', fingerprint || 'none']
       );
 

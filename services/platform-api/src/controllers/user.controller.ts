@@ -219,9 +219,9 @@ export const loginWithGoogle = async (
         user
       });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("Google Login Error:", error);
-    return sendResponse(reply, 401, true, "Google Authentication Failed");
+    return sendResponse(reply, 401, true, error.message || "Google Authentication Failed");
   }
 };
 

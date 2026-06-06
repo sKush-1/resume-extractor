@@ -127,6 +127,7 @@ services:
       - "127.0.0.1:4072:4000"
     env_file:
       - .env
+    command: sh -c "pnpm migrate:prod && node dist/server.js"
     depends_on:
       postgres:
         condition: service_healthy

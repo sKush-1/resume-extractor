@@ -7,7 +7,8 @@
     "build": "npx tsc",
     "start": "node dist/server.js",
     "dev": "tsx watch src/server.ts",
-    "migrate": "node-pg-migrate -m src/config/database/migrations up"
+    "migrate": "node-pg-migrate -m src/config/database/migrations up",
+    "migrate:prod": "node-pg-migrate -m dist/config/database/migrations up"
   },
   "keywords": [],
   "author": "",

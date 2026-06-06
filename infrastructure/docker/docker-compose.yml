@@ -138,6 +138,7 @@ services:
       redisHost: redis
       redisPORT: 6379
       S3_ENDPOINT: http://minio:9000
+    command: sh -c "pnpm migrate:prod && node dist/server.js"
     depends_on:
       postgres:
         condition: service_healthy

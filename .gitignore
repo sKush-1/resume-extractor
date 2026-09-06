@@ -43,3 +43,4 @@ docker-compose.override.yml
 uploads/
 exports/
 temp/
+dump.rdb

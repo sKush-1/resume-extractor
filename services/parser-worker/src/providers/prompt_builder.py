@@ -18,7 +18,9 @@ def build_extraction_prompt(metrics: list = None) -> str:
     
     schema_dict = {}
     for m in metrics:
-        schema_dict[m["name"]] = f"string ({m['description']})"
+        # Trim and normalize name for key consistency
+        key = m["name"].strip()
+        schema_dict[key] = f"string ({m['description']})"
 
     schema_json = json.dumps(schema_dict, indent=2)
 

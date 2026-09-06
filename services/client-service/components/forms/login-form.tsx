@@ -124,7 +124,7 @@ export function LoginForm() {
       <div>
         <h1 className="text-2xl font-bold text-foreground mb-2">Welcome back</h1>
         <p className="text-sm text-muted-foreground">
-          Sign in to your ResumeParse account
+          Sign in to your BulkParser.com account
         </p>
       </div>
 

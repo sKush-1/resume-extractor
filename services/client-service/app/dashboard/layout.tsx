@@ -2,6 +2,7 @@
 
 import { Sidebar } from '@/components/layout/sidebar';
 import { Header } from '@/components/layout/header';
+import { Footer } from '@/components/layout/footer';
 import { useAuth } from '@/contexts/auth-context';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
@@ -34,12 +35,15 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <Sidebar />
       <Header />
-      <main className="lg:ml-64 pt-16">
+      <main className="lg:ml-64 pt-4 flex-grow">
         {children}
       </main>
+      <div className="lg:ml-64">
+        <Footer />
+      </div>
     </div>
   );
 }

@@ -43,12 +43,16 @@ export const registerWithEmail = async (
     }
 
     const deviceId = request.headers['x-device-id'] as string;
+    const fingerprint = request.headers['x-fingerprint'] as string;
+    const ip = (request.headers['x-forwarded-for'] as string) || request.ip;
 
     const registerUserID = await userEmailRegisterService(
       email,
       name,
       password,
       deviceId,
+      ip,
+      fingerprint,
     );
 
     const dbUser = await getUserByEmail(email);
@@ -181,7 +185,10 @@ export const loginWithGoogle = async (
     }
 
     const deviceId = request.headers['x-device-id'] as string;
-    const user = await upsertGoogleUser(email, name, sub, deviceId);
+    const fingerprint = request.headers['x-fingerprint'] as string;
+    const ip = (request.headers['x-forwarded-for'] as string) || request.ip;
+
+    const user = await upsertGoogleUser(email, name, sub, deviceId, ip, fingerprint);
 
     const accessTokenPayload: user_access_token_payload = {
       user_id: user.id,
@@ -212,9 +219,9 @@ export const loginWithGoogle = async (
         user
       });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("Google Login Error:", error);
-    return sendResponse(reply, 401, true, "Google Authentication Failed");
+    return sendResponse(reply, 401, true, error.message || "Google Authentication Failed");
   }
 };
 

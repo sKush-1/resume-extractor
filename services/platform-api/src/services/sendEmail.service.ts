@@ -2,7 +2,7 @@ import { transporter } from "../utils/nodemailerTransporter.util";
 
 export async function sendVerificationEmail(to: string, token: string) {
   const mailOptions = {
-    from: `"Feet fascination" <${process.env.EMAIL_USER}>`,
+    from: `"BulkParser.com" <${process.env.EMAIL_USER}>`,
     to,
     subject: "Verify Your Email",
     html: `<p>Hello,</p>

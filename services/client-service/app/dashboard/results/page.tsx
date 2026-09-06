@@ -68,7 +68,7 @@ function ResultsPageContent() {
       ];
     }
     return selectedBatch.metrics.map((m: any) => ({
-      key: m.name.toLowerCase().replace(/\s+/g, '_'),
+      key: m.name.trim().toLowerCase().replace(/\s+/g, '_'),
       label: m.name
     }));
   }, [selectedBatch]);
@@ -123,10 +123,19 @@ function ResultsPageContent() {
         }
         if (candidatesRes.success) {
           // Flatten the parsed_data into the candidate object for easier table rendering
-          const flattenedResults = candidatesRes.data.map((c: any) => ({
-            ...c,
-            ...(c.parsed_data || {})
-          }));
+          const flattenedResults = candidatesRes.data.map((c: any) => {
+            const normalizedData: any = {};
+            if (c.parsed_data) {
+              Object.entries(c.parsed_data).forEach(([key, value]) => {
+                const normalizedKey = key.trim().toLowerCase().replace(/\s+/g, '_');
+                normalizedData[normalizedKey] = value;
+              });
+            }
+            return {
+              ...c,
+              ...normalizedData
+            };
+          });
           setResults(flattenedResults);
         }
       } catch (error) {

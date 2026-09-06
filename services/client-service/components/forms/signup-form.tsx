@@ -215,7 +215,7 @@ export function SignupForm() {
           Create your account
         </h1>
         <p className="text-sm text-muted-foreground">
-          Join thousands of recruiters using ResumeParse
+          Join thousands of recruiters using BulkParser.com
         </p>
       </div>
 

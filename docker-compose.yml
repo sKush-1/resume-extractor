@@ -10,7 +10,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -18,11 +18,13 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - app-network
 
   redis:
     image: redis:7-alpine
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6379:6379"
     volumes:
       - redisdata:/data
     healthcheck:
@@ -30,6 +32,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - app-network
 
   minio:
     image: minio/minio:latest
@@ -38,17 +42,18 @@ services:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9001:9001"
     volumes:
       - miniodata:/data
     healthcheck:
-      test: ["CMD", "mc", "ready", "local"]
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - app-network
 
-  # Create default bucket on startup
   minio-setup:
     image: minio/mc:latest
     depends_on:
@@ -58,25 +63,21 @@ services:
       /bin/sh -c "
       mc alias set local http://minio:9000 minioadmin minioadmin;
       mc mb --ignore-existing local/resumes;
-      echo 'Bucket created';
       exit 0;
       "
+    networks:
+      - app-network
 
   # ─── Application Services ───────────────────────
 
   api-gateway:
     build:
-      context: ../../
+      context: .
       dockerfile: services/api-gateway/Dockerfile
     ports:
-      - "8142:3000"
+      - "127.0.0.1:8142:3000"
     env_file:
-      - ../../.env
-    environment:
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/resume_etl
-      REDIS_URL: redis://redis:6379
-      S3_ENDPOINT: http://minio:9000
-      S3_FORCE_PATH_STYLE: "true"
+      - .env
     depends_on:
       postgres:
         condition: service_healthy
@@ -85,59 +86,47 @@ services:
       minio-setup:
         condition: service_completed_successfully
     restart: unless-stopped
+    networks:
+      - app-network
 
   parser-worker:
     build:
-      context: ../../
+      context: .
       dockerfile: services/parser-worker/Dockerfile
     env_file:
-      - ../../.env
-    environment:
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/resume_etl
-      REDIS_URL: redis://redis:6379
-      S3_ENDPOINT: http://minio:9000
-      S3_FORCE_PATH_STYLE: "true"
+      - .env
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
-    deploy:
-      replicas: 2
     restart: unless-stopped
+    networks:
+      - app-network
 
   export-service:
     build:
-      context: ../../
+      context: .
       dockerfile: services/export-service/Dockerfile
     env_file:
-      - ../../.env
-    environment:
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/resume_etl
-      REDIS_URL: redis://redis:6379
-      S3_ENDPOINT: http://minio:9000
-      S3_FORCE_PATH_STYLE: "true"
+      - .env
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
     restart: unless-stopped
+    networks:
+      - app-network
 
   platform-api:
     build:
-      context: ../../services/platform-api
+      context: services/platform-api
       dockerfile: Dockerfile
     ports:
-      - "4000:4000"
+      - "127.0.0.1:4072:4000"
     env_file:
-      - ../../services/platform-api/.env
-    environment:
-      DB_HOST: postgres
-      DB_PORT: 5432
-      redisHost: redis
-      redisPORT: 6379
-      S3_ENDPOINT: http://minio:9000
+      - .env
     command: sh -c "pnpm migrate:prod && node dist/server.js"
     depends_on:
       postgres:
@@ -145,20 +134,29 @@ services:
       redis:
         condition: service_healthy
     restart: unless-stopped
+    networks:
+      - app-network
 
   client-service:
     build:
-      context: ../../
+      context: .
       dockerfile: services/client-service/Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=https://platformapi.bulkparser.com/api/v1
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3072:3000"
     env_file:
-      - ../../services/client-service/.env
-    environment:
-      NEXT_PUBLIC_API_URL: http://localhost:4000/api/v1
+      - .env
     depends_on:
       - api-gateway
+      - platform-api
     restart: unless-stopped
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
 
 volumes:
   pgdata:

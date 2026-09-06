@@ -50,13 +50,13 @@ export function Sidebar() {
       {/* Logo */}
       <div className="flex items-center gap-3 px-6 py-4 border-b border-sidebar-border">
         <div className="w-8 h-8 rounded-lg bg-sidebar-primary flex items-center justify-center text-sidebar-primary-foreground font-bold">
-          RP
+          BP
         </div>
         <div className="flex flex-col">
           <span className="font-semibold text-sm text-sidebar-foreground">
-            ResumeParse
+            BulkParser.com
           </span>
-          <span className="text-xs text-sidebar-foreground/60">Beta</span>
+          {/* <span className="text-xs text-sidebar-foreground/60">Beta</span> */}
         </div>
       </div>
 

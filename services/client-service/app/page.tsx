@@ -1,33 +1,13 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Footer } from '@/components/layout/footer';
+import { Navbar } from '@/components/layout/navbar';
 import { CheckCircle2, Zap, BarChart3, FileText, ArrowRight } from 'lucide-react';
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background">
-      {/* Navigation */}
-      <nav className="border-b border-border sticky top-0 z-40 bg-background/95 backdrop-blur">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm">
-              RP
-            </div>
-            <span className="font-semibold text-foreground">ResumeParse</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <Link
-              href="/auth/login"
-              className="text-sm text-foreground hover:text-muted-foreground transition-colors"
-            >
-              Sign In
-            </Link>
-            <Button asChild>
-              <Link href="/auth/signup">Get Started</Link>
-            </Button>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* Hero Section */}
       <section className="max-w-6xl mx-auto px-6 py-20 md:py-32">
@@ -188,7 +168,7 @@ export default function LandingPage() {
       </section>
 
       {/* Pricing Section */}
-      <section className="bg-muted border-y border-border py-20">
+      <section id="pricing" className="bg-muted border-y border-border py-20">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
@@ -203,7 +183,7 @@ export default function LandingPage() {
             {[
               {
                 name: 'Starter',
-                price: '$99',
+                price: '$10',
                 description: 'Perfect for small teams',
                 features: [
                   'Up to 100 resumes/month',
@@ -214,7 +194,7 @@ export default function LandingPage() {
               },
               {
                 name: 'Professional',
-                price: '$499',
+                price: '$20.00',
                 description: 'For growing companies',
                 features: [
                   'Up to 1,000 resumes/month',
@@ -240,11 +220,10 @@ export default function LandingPage() {
             ].map((plan, index) => (
               <div
                 key={index}
-                className={`rounded-xl border p-8 ${
-                  plan.highlight
-                    ? 'border-primary bg-primary/5 relative'
-                    : 'border-border bg-background'
-                }`}
+                className={`rounded-xl border p-8 ${plan.highlight
+                  ? 'border-primary bg-primary/5 relative'
+                  : 'border-border bg-background'
+                  }`}
               >
                 {plan.highlight && (
                   <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">
@@ -293,7 +272,7 @@ export default function LandingPage() {
             Ready to Transform Your Hiring?
           </h2>
           <p className="text-lg mb-8 text-primary-foreground/90 max-w-2xl mx-auto">
-            Join hundreds of companies that trust ResumeParse to streamline their recruitment process.
+            Join hundreds of companies that trust BulkParser.com to streamline their recruitment process.
           </p>
           <Button asChild size="lg" variant="secondary">
             <Link href="/auth/signup">
